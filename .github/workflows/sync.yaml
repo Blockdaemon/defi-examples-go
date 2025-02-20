@@ -16,8 +16,7 @@ jobs:
         run: |
           git clone --mirror https://oauth2:${{ secrets.GILTAB_READ_TOKEN_PUBLIC_MIRROR }}@gitlab.com/Blockdaemon/research-development/interoperability/public/defi-examples-go.git repo
           cd repo
-          git checkout main
           git remote set-url --push origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Blockdaemon/defi-examples-go.git
-          git push origin main
+          git push --mirror
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
