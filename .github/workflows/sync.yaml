@@ -1,0 +1,22 @@
+name: Sync GitLab to GitHub
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+  workflow_dispatch:  # Allows manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone GitLab repo
+        run: |
+          git clone --mirror https://oauth2:${{ secrets.GILTAB_READ_TOKEN_PUBLIC_MIRROR }}@gitlab.com/Blockdaemon/research-development/interoperability/public/defi-examples-go.git repo
+          cd repo
+          git remote set-url --push origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Blockdaemon/defi-examples-go.git
+          git push --mirror
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
