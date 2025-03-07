@@ -14,9 +14,22 @@ jobs:
     steps:
       - name: Clone GitLab repo
         run: |
-          git clone --mirror https://oauth2:${{ secrets.GILTAB_READ_TOKEN_PUBLIC_MIRROR }}@gitlab.com/Blockdaemon/research-development/interoperability/public/defi-examples-go.git repo
+          git clone --bare https://oauth2:${{ secrets.GILTAB_READ_TOKEN_PUBLIC_MIRROR }}@gitlab.com/Blockdaemon/research-development/interoperability/public/defi-examples-go.git repo
           cd repo
-          git remote set-url --push origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Blockdaemon/defi-examples-go.git
-          git push --mirror
+          git remote add github https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Blockdaemon/defi-examples-go.git
+          
+          # Fetch main branch only
+          git fetch origin main:main
+          
+          # Push only main branch to GitHub
+          git push github main:main
+          
+          # Fetch and push only tags that don't exist on GitHub
+          git ls-remote --tags github > github_tags.txt
+          git for-each-ref --format='%(refname:short)' refs/tags/ | while read tag; do
+          if ! grep -q "refs/tags/$tag" github_tags.txt; then
+            git push github refs/tags/$tag:refs/tags/$tag
+          fi
+          done
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
